@@ -1,4 +1,5 @@
 import pandas as pd
+
 block = pd.read_clipboard(sep='\t')
 
 COLUMN_NAMES = [l for l in range(0, 102)]
