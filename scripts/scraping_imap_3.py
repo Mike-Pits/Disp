@@ -7,6 +7,7 @@ import email
 from email.header import decode_header
 import os
 import hashlib
+import codecs
 import sys
 import io
 
@@ -21,12 +22,12 @@ EMAIL_PASSWORD = 'nDj@gXaOm%j|e*Ni7'
 FOLDERS_TO_CHECK = ['Dikson_test']
 #'2_Dudinka_disps'
 CORRESPONDENTS = {
-    '*dikson*': '/home/mike-pi/Documents/coding/projects/disp/data/dikson',
+    '<np.dikson@ashipping.ru>': '/home/mike-pi/Documents/coding/projects/disp/data/dikson',
     
 }
 
 # 'sp.dudinka@ashipping.ru': '/home/mike-pi/Documents/coding/projects/disp/data/dudinka'
-SUBJECT_KEYWORD = '*Дисп*'
+SUBJECT_KEYWORD = 'Дисп'
 
 # Function to generate a unique hash for each message
 def generate_message_hash(msg):
@@ -83,44 +84,60 @@ for folder in FOLDERS_TO_CHECK:
                 continue
             
             # Extract the subject and sender
-            # subject, encoding = decode_header(msg['Subject'])[0]
-            # if isinstance(subject, bytes):
-            #     subject = subject.decode(encoding if encoding else 'utf-8')
+            subject, encoding = decode_header(msg['Subject'])[0]
+            if isinstance(subject, bytes):
+                subject = subject.decode(encoding if encoding else 'koi8-r')
             
             sender, encoding = decode_header(msg.get('From'))[0]
             if isinstance(sender, bytes):
                 sender = sender.decode(encoding if encoding else 'koi8-r')
             
             # Save the message to a file
-            filename = f"{sender.replace('@', '_').replace('.', '_')}.txt"
+            filename = msg_hash[:5]
+            # f"{sender.replace('@', '_').replace('.', '_')}.txt"
             # _{subject.replace(' ', '_')[:9]}
             # print(filename.strip('<>'))
-            with open(os.path.join(output_folder, filename.strip('<>')), 'w', encoding='koi8-r') as f:
+            with open(os.path.join(output_folder, filename), 'w', encoding='koi8-r') as f:
                 f.write(f"Hash: {msg_hash}\n")
                 # f.write(f"Subject: {subject}\n")
                 f.write(f"From: {sender}\n")
                 f.write(f"To: {msg['To']}\n")
                 f.write(f"Date: {msg['Date']}\n\n")
+                # body = msg.get_payload(decode=True).decode(encoding if encoding else 'koi8-r')
+                # f.write(body)
                 
                 # If the message is multipart, iterate over each part
                 if msg.is_multipart():
-                    continue
-                    # for part in msg.walk():
-                    #     content_type = part.get_content_type()
-                    #     content_disposition = str(part.get("Content-Disposition"))
+                    # continue
+                    for part in msg.walk():
+                        content_type = part.get_content_type()
+                        content_disposition = str(part.get("Content-Disposition"))
+                        # body = part.get_payload(decode=True).decode(encoding if encoding else 'koi8-r')
+                        # f.write(body)
                         
-                    #     # Skip any attachments
-                    #     if "attachment" in content_disposition:
-                    #         continue
+                        # Skip any attachments
+                        if "attachment" in content_disposition:
+                            continue
                         
-                    #     # Extract the text content
-                    #     if content_type == "text/plain":
-                    #         body = part.get_payload(decode=True).decode(encoding if encoding else 'koi8-r')
-                    #         f.write(body)
+                        # Extract the text content
+                        if content_type == "text/plain":
+                            #  or content_type == "text/html" 
+                            body = part.get_payload(decode=True).decode(encoding='koi8-r')
+                                # encoding if encoding else 'koi8-r')
+                            f.write(body)
                 else:
                     # If the message is not multipart, just extract the payload
                     body = msg.get_payload(decode=True).decode(encoding if encoding else 'koi8-r')
                     f.write(body)
+
+            with codecs.open(os.path.join(output_folder, filename), 'r', encoding=encoding) as infile:
+            # Read the content
+                content = infile.read()
+        
+            # Open the output file with UTF-8 encoding
+            with codecs.open(os.path.join(output_folder, filename), 'w', encoding='utf-8') as outfile:
+                # Write the content
+                outfile.write(content)
 
 # Close the connection and logout
 mail.close()
