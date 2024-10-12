@@ -6,8 +6,8 @@ import os
 # Configuration
 
 IMAP_SERVER = 'imap.yandex.com'
-EMAIL_ACCOUNT = 'm.pitsukov@tcnordproject.ru'
-EMAIL_PASSWORD = 'nDj@gXaOm%j|e*Ni7'
+EMAIL_ACCOUNT = ''
+EMAIL_PASSWORD = ''
 FOLDERS_TO_CHECK = []
 #'2_Dudinka_disps'
 CORRESPONDENTS = {
