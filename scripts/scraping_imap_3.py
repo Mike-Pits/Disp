@@ -8,26 +8,21 @@ from email.header import decode_header
 import os
 import hashlib
 import codecs
+from dotenv import load_dotenv, dotenv_values
 import sys
 import io
-
+load_dotenv()
 # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 
 
 # Configuration
-IMAP_SERVER = 'imap.yandex.com'
-EMAIL_ACCOUNT = 'm.pitsukov@tcnordproject.ru'
-EMAIL_PASSWORD = 'nDj@gXaOm%j|e*Ni7'
-FOLDERS_TO_CHECK = ['Dikson_test']
-#'2_Dudinka_disps'
-CORRESPONDENTS = {
-    '<np.dikson@ashipping.ru>': '/home/mike-pi/Documents/coding/projects/disp/data/dikson',
-    
-}
-
-# 'sp.dudinka@ashipping.ru': '/home/mike-pi/Documents/coding/projects/disp/data/dudinka'
-SUBJECT_KEYWORD = 'Дисп'
+IMAP_SERVER =  os.getenv('IMAP_SERVER')
+EMAIL_ACCOUNT = os.getenv('EMAIL_ACCOUNT')
+EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
+FOLDERS_TO_CHECK = os.getenv('FOLDERS_TO_CHECK')
+CORRESPONDENTS = os.getenv('CORRESPONDENTS')
+SUBJECT_KEYWORD = os.getenv('SUBJECT_KEYWORD')
 
 # Function to generate a unique hash for each message
 def generate_message_hash(msg):
